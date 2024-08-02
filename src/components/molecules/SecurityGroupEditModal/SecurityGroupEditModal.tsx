@@ -38,7 +38,7 @@ export const SecurityGroupEditModal: FC<TSecurityGroupEditModalProps> = ({
 
   useEffect(() => {
     if (typeof externalOpenInfo !== 'boolean') {
-      form.setFieldsValue({ ...externalOpenInfo, networks: externalOpenInfo.networks.map(el => el.split(' : ')[0]) })
+      form.setFieldsValue(externalOpenInfo)
     }
   }, [externalOpenInfo, form])
 
@@ -46,37 +46,30 @@ export const SecurityGroupEditModal: FC<TSecurityGroupEditModalProps> = ({
     (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
 
   useEffect(() => {
-    if (typeof externalOpenInfo !== 'boolean') {
-      setIsLoading(true)
-      setError(undefined)
-      Promise.all([getNetworks(), getSecurityGroups()])
-        .then(([nwResponse, allSgsResponse]) => {
-          const allNetworksNameAndCidrs = nwResponse.data.networks.map(({ name, network }) => ({
-            name,
-            cidr: network.CIDR,
-          }))
-          const allSgsExceptSelf = allSgsResponse.data.groups.filter(({ name }) => name !== externalOpenInfo.name)
-          const unavailableNetworksName = allSgsExceptSelf.flatMap(({ networks }) => networks)
-          const availableNetworks = allNetworksNameAndCidrs.filter(el => !unavailableNetworksName.includes(el.name))
-          setNetworkOptions(
-            availableNetworks
-              .map(({ name, cidr }) => ({ label: `${name}:${cidr}`, value: name }))
-              .sort((a, b) => a.label.localeCompare(b.label)),
-          )
-          setIsLoading(false)
-        })
-        .catch((error: AxiosError<TRequestErrorData>) => {
-          setIsLoading(false)
-          if (error.response) {
-            setError({ status: error.response.status, data: error.response.data })
-          } else if (error.status) {
-            setError({ status: error.status })
-          } else {
-            setError({ status: 'Error while fetching' })
-          }
-        })
-    }
-  }, [externalOpenInfo])
+    setIsLoading(true)
+    setError(undefined)
+    Promise.all([getNetworks(), getSecurityGroups()])
+      .then(([nwResponse, allSgsResponse]) => {
+        const allNetworksNameAndCidrs = nwResponse.data.networks.map(({ name, network }) => ({
+          name,
+          cidr: network.CIDR,
+        }))
+        const unavailableNetworksName = allSgsResponse.data.groups.flatMap(({ networks }) => networks)
+        const availableNetworks = allNetworksNameAndCidrs.filter(el => !unavailableNetworksName.includes(el.name))
+        setNetworkOptions(availableNetworks.map(({ name, cidr }) => ({ label: `${name}:${cidr}`, value: name })))
+        setIsLoading(false)
+      })
+      .catch((error: AxiosError<TRequestErrorData>) => {
+        setIsLoading(false)
+        if (error.response) {
+          setError({ status: error.response.status, data: error.response.data })
+        } else if (error.status) {
+          setError({ status: error.status })
+        } else {
+          setError({ status: 'Error while fetching' })
+        }
+      })
+  }, [])
 
   const submit = () => {
     form

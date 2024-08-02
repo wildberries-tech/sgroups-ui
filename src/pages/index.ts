@@ -1,6 +1,5 @@
 export { MainPage } from './MainPage'
 export { SecurityGroupsPage } from './SecurityGroupsPage'
 export { NetworksPage } from './NetworksPage'
-export { RulesPage } from './RulesPage'
-export { RulesDiagramPage } from './RulesDiagramPage'
+export { RulesEditorPage } from './RulesEditorPage'
 export { GraphPage } from './GraphPage'

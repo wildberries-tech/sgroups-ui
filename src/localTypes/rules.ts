@@ -1,3 +1,5 @@
+import { TooltipPlacement } from 'antd/es/tooltip'
+
 /* internal types */
 export type TRulesTypes = 'sgSg' | 'sgSgIcmp' | 'sgSgIe' | 'sgSgIeIcmp' | 'sgFqdn' | 'sgCidr' | 'sgCidrIcmp'
 
@@ -6,9 +8,11 @@ export type TRulesSubTypes = 'from' | 'to'
 export type TRulesTables<T> = {
   direction: TRulesSubTypes
   isChangesMode: boolean
+  popoverPosition: TooltipPlacement
   rulesData: T[]
   isDisabled?: boolean
   isRestoreButtonActive?: boolean
+  forceArrowsUpdate?: () => void
 }
 
 /* common properties */
